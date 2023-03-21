@@ -90,6 +90,11 @@ class REMI(MIDITokenizer):
         bar_counter = 0
         time_signatures = self._current_midi_metadata["time_sig_changes"]
         ts_numerator_tick, ts_denominator,  ticks_ts_change = zip(*map(lambda x: (self._current_midi_metadata["time_division"]* x.numerator, x.denominator, x.time), time_signatures))
+        # NOTE: assync
+        ticks_ts_change = list(ticks_ts_change)
+        first_ts = ticks_ts_change.pop(0)
+        assert first_ts == 0, "Undefined time signature for time = 0"
+        ticks_ts_change.append(9223372036854775807)
         assert all(x == ts_denominator[0] for x in ts_denominator), "Not implimented for changed enumerator time signature."
         dur_bins = self._durations_ticks[self._current_midi_metadata["time_division"]]
         min_rest = (
